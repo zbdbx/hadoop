@@ -17,14 +17,29 @@ EXPOSE 22
 # CMD ["/usr/sbin/sshd", "-D"]
 
 FROM centos7_ssh
-WORKDIR /data
-ADD  https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u362-b09/OpenJDK8U-jdk_x64_linux_hotspot_8u362b09.tar.gz /opt/module
-ADD  https://dlcdn.apache.org/hadoop/common/hadoop-3.3.3/hadoop-3.3.3.tar.gz /opt/module
-ADD  https://dlcdn.apache.org/hive/hive-3.1.3/apache-hive-3.1.3-bin.tar.gz /opt/module
-RUN cd /opt/module/ && ls -la \
+WORKDIR /opt/module
+# ADD  https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u362-b09/OpenJDK8U-jdk_x64_linux_hotspot_8u362b09.tar.gz /opt/module
+# ADD  https://dlcdn.apache.org/hadoop/common/hadoop-3.3.3/hadoop-3.3.3.tar.gz /opt/module
+# ADD  https://dlcdn.apache.org/hive/hive-3.1.3/apache-hive-3.1.3-bin.tar.gz /opt/module
+# RUN mkdir /opt/module/ -p && cd /opt/module/ \
+#     && mv jdk8u362-b09 jdk8 \
+#     && mv apache-hive-3.1.3-bin hive-3.1.3 \
+#     # && mv hadoop-3.3.3 hadoop-3.3.3 
+#     && ls
+
+RUN ls /opt/module \
+    && curl -SL https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u362-b09/OpenJDK8U-jdk_x64_linux_hotspot_8u362b09.tar.gz \
+    | tar -xJC /opt/module \
+    && curl -SL https://dlcdn.apache.org/hadoop/common/hadoop-3.3.3/hadoop-3.3.3.tar.gz \
+    | tar -xJC /opt/module \
+    && curl -SL https://dlcdn.apache.org/hive/hive-3.1.3/apache-hive-3.1.3-bin.tar.gz \
+    | tar -xJC /opt/module \
+    && pwd && ls \
     && mv jdk8u362-b09 jdk8 \
-    && mv apache-hive-3.1.3-bin hive-3.1.3
-    # && mv hadoop-3.3.3 hadoop-3.3.3 
+    && mv apache-hive-3.1.3-bin hive-3.1.3 \
+    # && mv hadoop-3.3.3 hadoop-3.3.3 \
+    && ls
+
 ENV JAVA_HOME=/opt/module/jdk8
 ENV HADOOP_HOME=/opt/module/hadoop-3.3.3
 ENV HIVE_HOME=/opt/module/hive-3.1.3
@@ -44,6 +59,7 @@ COPY ./config/run.sh /opt/
 VOLUME [ "/data" ]
 EXPOSE 9000 8088 9864 19888 9870
 
+WORKDIR /data
 
 ENTRYPOINT ["sh"]
 
